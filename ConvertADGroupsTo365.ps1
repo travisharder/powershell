@@ -1,4 +1,4 @@
-﻿######################################################################################################
+######################################################################################################
 #                                                                                                    #
 # Name:        ConvertADGroupsto365.ps1                                                              #
 #                                                                                                    #
@@ -171,18 +171,18 @@ Start-ADSyncSyncCycle -PolicyType Delta
 # Pauses script for 5 minutes to allow AD sync to take effect
 Start-Sleep -s 300
 
+$CloudGroups = Get-DistributionGroup -Filter {Name -like 'Cloud-*'}
 
-foreach ($ADG in $OnPremGroups)
+foreach ($ICG in $CloudGroups)
 {
-    $TempDG = Get-DistributionGroup "Cloud-$ADG.Name"
-    $TempPrimarySmtpAddress = $TempDG.PrimarySmtpAddress
-    $NewDGName = $TempDG.Name.Replace("Cloud","")
-    $NewDGDisplayName = $TempDG.DisplayName.Replace("Cloud-","")
-    $NewDGAlias = $TempDG.Alias.Replace("Cloud-","")
-    $NewPrimarySmtpAddress = $TempDG.PrimarySmtpAddress.Replace("Cloud-","")
+    $TempPrimarySmtpAddress = $ICG.PrimarySmtpAddress
+    $NewDGName = $ICG.Name.Substring(6)
+    $NewDGDisplayName = $ICG.DisplayName.Substring(6)
+    $NewDGAlias = $ICG.Alias.Substring(6)
+    $NewPrimarySmtpAddress = $ICG.PrimarySmtpAddress.Substring(6)
 
     Set-DistributionGroup `
-        -Identity $TempDG.Name `
+        -Identity $ICG.Name `
         -Name $NewDGName `
         -Alias $NewDGAlias `
         -DisplayName $NewDGDisplayName `
